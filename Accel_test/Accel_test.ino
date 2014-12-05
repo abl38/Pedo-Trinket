@@ -22,10 +22,7 @@
 #include <Adafruit_Sensor.h>
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
-long previous = 0;
-long current = 0;
-long testingTime = 0;
-long count = 0;
+
 int loopFrequency = 50; //Hz
 int tempAcc[] = {0,0,0};
 
@@ -34,7 +31,7 @@ void setup(void) {
   
   Serial.println("Adafruit MMA8451 test!");
 
-   previous = micros();
+
   if (! mma.begin()) {
     Serial.println("Couldnt start");
     while (1);
@@ -42,17 +39,13 @@ void setup(void) {
   Serial.println("MMA8451 found!");
   
   mma.setRange(MMA8451_RANGE_2_G);
-  mma.setDataRate(MMA8451_DATARATE_200_HZ); 
+  mma.setDataRate(MMA8451_DATARATE_100_HZ); 
 
 }
 
 
 
 void loop() {
- 
-  //if (1.0/((micros() - previous)/1000000.0) < loopFrequency) {
-  count = count + 1;
-  previous = micros();  
   
   mma.read();
   /* Display the results (acceleration is measured in m/s^2) */
@@ -64,7 +57,6 @@ tempAcc[1] = mma.x;
 tempAcc[2] = mma.y;
 tempAcc[3] = mma.z;
 
-  current = micros();
   //Serial.print("Oneloop: "); 
   //Serial.println(current - previous);
   

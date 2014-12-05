@@ -5,10 +5,11 @@ function data = mAvgFilter2(dataInput, window)
     for i = 1:length(dataInput)
         %When not enough elements for complete window
         if i <= window
-            %tempData = average of first i elements when window is greate
+            %tempData = average of first i elements when window is bi
             tempData(i) = mean(dataInput(1:i));
         elseif i > window
-            %average of elements from (i-window) to i 
+            %average of window number of elements before dataInput(i)
+           
             tempData(i) = mean((dataInput((i-window):i)));
         end
     end

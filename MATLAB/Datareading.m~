@@ -29,7 +29,7 @@ yzData = yData + zData;
 
 
 % Window for moving average filter (Higher value = More Smoothing, More Delay)
-avgWindow = 8;
+avgWindow = 12;
 
 % Plot RAW Acceleration Data
 figure
@@ -53,54 +53,55 @@ yzAcc = mAvgFilter2(yzData,avgWindow);
 plot([sumAcc xAcc yAcc zAcc])
 legend('sumAcc','xAcc','yAcc','zAcc')
 
-% Take derivative of Acceleration (Jerk
+% Take discrete derivative of Acceleration
 % Derivative = backDiff(Data, filterWindow)
-xJerk = backDiff(xAcc,avgWindow);
-yJerk = backDiff(yAcc,avgWindow);
-zJerk = backDiff(zAcc,avgWindow);
+xJerk = backDiff(xAcc,8);
+yJerk = backDiff(yAcc,8);
+zJerk = backDiff(zAcc,8);
 sumJerk = xJerk + yJerk + zJerk;
 
-xyJerk = mAvgFilter2(xJerk + yJerk, avgWindow);
-xzJerk = mAvgFilter2(xJerk + zJerk,avgWindow);
-yzJerk = mAvgFilter2(yJerk + zJerk,avgWindow);
+xyJerk = xJerk + yJerk;
+xzJerk = xJerk + zJerk;
+yzJerk = yJerk + zJerk;
 
-% Second Derivative of Acceleration (Jounce/Snap) UNUSED
 xJounce = backDiff(xJerk,5);
 yJounce = backDiff(yJerk,5);
 zJounce = backDiff(zJerk,5);
 
-% Plot Jerk Data (IMPORTANT DATA)
 figure 
 plot([sumJerk xJerk yJerk zJerk])
 title('xJerk & yJerk; zJerk')
 legend('sum','x','y','z')
+figure
+plot(xyJerk)
 
-% Plot 2D sums for orientated data (UNUSED)
 figure
 plot([xyJerk xzJerk yzJerk])
 legend( 'xyJerk', 'xzJerk', 'yzJerk')
 
 
-% Find Peaks using Jerk Threshold 
-close all
-minIndex = 100;
-maxIndex = 800;
+%% Peak Detection using sumJerk
 
+%EMA
+Thresh6 = stdDev(sumJerk, avgWindow*6);
+Thresh4 = stdDev(sumJerk, avgWindow*4);
+Thresh2 = stdDev(sumJerk, avgWindow*2);
+
+figure
+plot([sumJerk Thresh6 Thresh4 Thresh2])
+legend('sum','6x', '4x','2x')
+
+%%
 figure
 threshJerk = 100;
 jerkAboveT = (sumJerk > threshJerk)*threshJerk;
 jerkBelowT = (sumJerk < -threshJerk)*-threshJerk;
-plot([sumJerk(minIndex:maxIndex) jerkAboveT(minIndex:maxIndex) jerkBelowT(minIndex:maxIndex)])
+plot([sumJerk jerkAboveT jerkBelowT])
 title('sumJerk')
 
-%Find Peaks using Acceleration Threshold
 figure
-threshAcc = 250;
+threshAcc = 75;
 accAboveT = (sumAcc > threshAcc)*threshAcc;
 accBelowT = (sumAcc < -threshAcc)*-threshAcc;
-plot([sumAcc(minIndex:maxIndex) accAboveT(minIndex:maxIndex) accBelowT(minIndex:maxIndex)])
+plot([sumAcc accAboveT accBelowT])
 title('sumAcc')
-
-overlapI = and(accAboveT, jerkAboveT);
-overlap = and(accAboveT, jerkAboveT);
-
