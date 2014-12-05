@@ -2,13 +2,14 @@ clear all
 close all
 clc
 
-data = csvread('Demo Data Walking.txt');
+data = csvread('Demo xy Rotation.txt');
 time = data(:,1)/1000000;
 xData = data(:,2);
 yData = data(:,3);
 zData = data(:,4);
 
 avgDT = (time(end) - time(1)) / length(time)
+Freq = 1/avgDT
 
 xData = xData - mean(xData);
 yData = yData - mean(yData);
@@ -65,6 +66,6 @@ plot([xPosFilt yPosFilt zPosFilt])
 title('Position')
 legend('x','y','z')
 figure 
-plot([xAcc xJerk xJounce])
-title('x Acc, Jerk, Jounce')
-legend('a','da','d2a')
+plot([xJerk yJerk zJerk])
+title('xJerk & yJerk; zJerk')
+legend('x','y','z')

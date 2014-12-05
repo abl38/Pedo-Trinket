@@ -42,7 +42,7 @@ void setup(void) {
   Serial.println("MMA8451 found!");
   
   mma.setRange(MMA8451_RANGE_2_G);
-  mma.setDataRate(MMA8451_DATARATE_100_HZ); 
+  mma.setDataRate(MMA8451_DATARATE_200_HZ); 
 
 }
 
