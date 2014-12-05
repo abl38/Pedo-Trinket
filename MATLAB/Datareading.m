@@ -2,7 +2,7 @@ clear all
 close all
 clc
 
-data = csvread('Demo Data.txt');
+data = csvread('Demo Data Walking.txt');
 time = data(:,1)/1000000;
 xData = data(:,2);
 yData = data(:,3);

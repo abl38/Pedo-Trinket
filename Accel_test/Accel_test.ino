@@ -43,20 +43,14 @@ void setup(void) {
   
   mma.setRange(MMA8451_RANGE_2_G);
   mma.setDataRate(MMA8451_DATARATE_100_HZ); 
-  
-  sensors_event_t event;
-  mma.getEvent(&event);
 
-
-//Serial.write(tempAcc, 12);
-//Serial.flush();
 }
 
 
 
 void loop() {
  
-  if (1.0/((micros() - previous)/1000000.0) < loopFrequency) {
+  //if (1.0/((micros() - previous)/1000000.0) < loopFrequency) {
   count = count + 1;
   previous = micros();  
   
@@ -73,7 +67,8 @@ tempAcc[3] = mma.z;
   current = micros();
   //Serial.print("Oneloop: "); 
   //Serial.println(current - previous);
-  } 
+  
+  //} 
    
 }
 
