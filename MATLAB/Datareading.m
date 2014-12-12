@@ -2,7 +2,7 @@ clear all
 close all
 clc
 %Reading in CSV data
-data = csvread('Walking 36 Steps.txt');
+data = csvread('Data 10 F Steps - 10 B Steps - Shaking .txt');
 % Data is in format [time, xData, yData, zData] 
 % Time is in microseconds
 time = data(:,1)/1000000;
@@ -58,16 +58,11 @@ legend('sumAcc','xAcc','yAcc','zAcc')
 xJerk = backDiff(xAcc,avgWindow);
 yJerk = backDiff(yAcc,avgWindow);
 zJerk = backDiff(zAcc,avgWindow);
-sumJerk = xJerk + yJerk + zJerk;
+sumJerk = sqrt(xJerk.^2 + yJerk.^2 + zJerk.^2);
 
 xyJerk = mAvgFilter2(xJerk + yJerk, avgWindow);
 xzJerk = mAvgFilter2(xJerk + zJerk,avgWindow);
 yzJerk = mAvgFilter2(yJerk + zJerk,avgWindow);
-
-% Second Derivative of Acceleration (Jounce/Snap) UNUSED
-xJounce = backDiff(xJerk,5);
-yJounce = backDiff(yJerk,5);
-zJounce = backDiff(zJerk,5);
 
 % Plot Jerk Data (IMPORTANT DATA)
 figure 
@@ -77,30 +72,44 @@ legend('sum','x','y','z')
 
 % Plot 2D sums for orientated data (UNUSED)
 figure
-plot([xyJerk xzJerk yzJerk])
-legend( 'xyJerk', 'xzJerk', 'yzJerk')
+plot([sumJerk xyJerk xzJerk yzJerk])
+legend('sumJerk', 'xyJerk', 'xzJerk', 'yzJerk')
 
-
-% Find Peaks using Jerk Threshold 
+%% Low pass Filter
 close all
-minIndex = 100;
-maxIndex = 800;
+L = length(time);
+n = 2^nextpow2(L);
+xF = fft(xData,n)/L;
+yF = fft(yData,n)/L;
+zF = fft(zData,n)/L;
 
+f = Freq/2*linspace(0,1,n/2+1);
 figure
-threshJerk = 100;
-jerkAboveT = (sumJerk > threshJerk)*threshJerk;
-jerkBelowT = (sumJerk < -threshJerk)*-threshJerk;
-plot([sumJerk(minIndex:maxIndex) jerkAboveT(minIndex:maxIndex) jerkBelowT(minIndex:maxIndex)])
-title('sumJerk')
+plot(f, 2*abs(xF(1:n/2+1)))
 
-%Find Peaks using Acceleration Threshold
+xF(250:end) = 0;
+xIf = mAvgFilter2(real(ifft(xF)),avgWindow);
+xIf2 = mAvgFilter2(LPF(xData, 5, Freq), avgWindow);
 figure
-threshAcc = 250;
-accAboveT = (sumAcc > threshAcc)*threshAcc;
-accBelowT = (sumAcc < -threshAcc)*-threshAcc;
-plot([sumAcc(minIndex:maxIndex) accAboveT(minIndex:maxIndex) accBelowT(minIndex:maxIndex)])
-title('sumAcc')
+plot(xIf)
+hold on
+plot(xIf2)
 
-overlapI = and(accAboveT, jerkAboveT);
-overlap = and(accAboveT, jerkAboveT);
+%% Splitting Data
+cellSum = splitRawAcc(sumAcc,avgWindow, 150);
+stepsCount = 0;
+recompJerk=[];
+recompAcc = [];
+length(cellSum)
+for i = 1:length(cellSum)
+    sumCellJerk{i} = backDiff(cellSum{i},avgWindow);
+    stepsCount = stepsCount + countPeaks(sumCellJerk{i},50);
+    recompAcc = cat(1,recompAcc,  cellSum{i});
+    recompJerk = cat(1,recompJerk,  sumCellJerk{i});
+end
+stepsCount
+figure 
+plot(recompJerk)
+figure
+plot(recompAcc)
 
