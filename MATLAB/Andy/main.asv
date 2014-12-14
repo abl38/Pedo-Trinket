@@ -1,0 +1,23 @@
+clear all
+close all
+clc
+
+data = csvread('Walking 36 Steps.txt');
+
+timeData = data(:,1)/1000000;
+xData = data(:,2);
+yData = data(:,3);
+zData = data(:,4);
+
+% create vector
+vectorData = [xData yData zData];
+prevVectorData = vectorData;
+
+for i=1:length(vectorData)
+        prevVectorData(i) = [xData(i-1), yData(i-1), zData(i-1)];
+    end
+end
+
+dataAngle1 = acos(dot(vectorData,prevVectorData)/dot(abs(vectorData),abs(prevVectorData)));
+
+plot(timeData,dataAngle1);
