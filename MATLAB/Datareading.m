@@ -2,7 +2,7 @@ clear all
 close all
 clc
 %Reading in CSV data
-data = csvread('Data 10 F Steps - 10 B Steps - Shaking .txt');
+data = csvread('Walking 36 Steps.txt');
 % Data is in format [time, xData, yData, zData] 
 % Time is in microseconds
 time = data(:,1)/1000000;
@@ -58,7 +58,7 @@ legend('sumAcc','xAcc','yAcc','zAcc')
 xJerk = backDiff(xAcc,avgWindow);
 yJerk = backDiff(yAcc,avgWindow);
 zJerk = backDiff(zAcc,avgWindow);
-sumJerk = sqrt(xJerk.^2 + yJerk.^2 + zJerk.^2);
+sumJerk = xJerk + yJerk + zJerk;
 
 xyJerk = mAvgFilter2(xJerk + yJerk, avgWindow);
 xzJerk = mAvgFilter2(xJerk + zJerk,avgWindow);
@@ -71,30 +71,9 @@ title('xJerk & yJerk; zJerk')
 legend('sum','x','y','z')
 
 % Plot 2D sums for orientated data (UNUSED)
-figure
-plot([sumJerk xyJerk xzJerk yzJerk])
-legend('sumJerk', 'xyJerk', 'xzJerk', 'yzJerk')
-
-%% Low pass Filter
-close all
-L = length(time);
-n = 2^nextpow2(L);
-xF = fft(xData,n)/L;
-yF = fft(yData,n)/L;
-zF = fft(zData,n)/L;
-
-f = Freq/2*linspace(0,1,n/2+1);
-figure
-plot(f, 2*abs(xF(1:n/2+1)))
-
-xF(250:end) = 0;
-xIf = mAvgFilter2(real(ifft(xF)),avgWindow);
-xIf2 = mAvgFilter2(LPF(xData, 5, Freq), avgWindow);
-figure
-plot(xIf)
-hold on
-plot(xIf2)
-
+% figure
+% plot([sumJerk xyJerk xzJerk yzJerk])
+% legend('sumJerk', 'xyJerk', 'xzJerk', 'yzJerk')
 %% Splitting Data
 cellSum = splitRawAcc(sumAcc,avgWindow, 150);
 stepsCount = 0;
@@ -102,14 +81,20 @@ recompJerk=[];
 recompAcc = [];
 length(cellSum)
 for i = 1:length(cellSum)
-    sumCellJerk{i} = backDiff(cellSum{i},avgWindow);
-    stepsCount = stepsCount + countPeaks(sumCellJerk{i},50);
+    temp = backDiff(cellSum{i},avgWindow);
+    %stepsCount = stepsCount + countPeaks(sumCellJerk{i},50);
     recompAcc = cat(1,recompAcc,  cellSum{i});
-    recompJerk = cat(1,recompJerk,  sumCellJerk{i});
+    recompJerk = cat(1,recompJerk,  temp);
 end
-stepsCount
+stepsCount = countPeaks(recompJerk, 105)
 figure 
 plot(recompJerk)
+title('Recomposed Jerk')
 figure
 plot(recompAcc)
+title('Recomposed Acceleration')
+%%
+figure
+peakArray = getPeaks(sumAcc, avgWindow);
+plot([peakArray', sumAcc])
 

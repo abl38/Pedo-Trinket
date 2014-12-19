@@ -1,4 +1,5 @@
-function numPeaks = countPeaks(data, threshold)
+function peaks = countPeaksAdaptive(data)
+% IN PROGRESS 
 peakArray = (data > threshold) + (data < -threshold);
 count = 0;
 currentIndex = 1;
@@ -8,5 +9,5 @@ for i = 1:(length(peakArray)-1)
         currentIndex = i;
     end
 end
-numPeaks = floor(count/2); 
+peaks = floor(count/2); 
 end

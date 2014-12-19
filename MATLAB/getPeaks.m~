@@ -1,0 +1,15 @@
+function peakArray = getPeaks(accData, window)
+jerk = backDiff(accData, window);
+
+tempArray = [];
+for i = 2:length(jerk)
+    if (jerk(i) < 0 && jerk(i-1) > 0) || (jerk(i) > 0 && jerk(i-1) < 0) 
+        peaksArray(i) = accData(i);
+    else
+        peaksArray(i) = 0;
+        c=c+1;
+    end
+    
+end
+
+end
