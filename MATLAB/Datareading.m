@@ -94,7 +94,11 @@ figure
 plot(recompAcc)
 title('Recomposed Acceleration')
 %%
+close all
 figure
 peakArray = getPeaks(sumAcc, avgWindow);
 plot([peakArray', sumAcc])
-
+figure
+splined = getSplinedMean(sumAcc, avgWindow);
+plot((sumAcc - splined'));
+title('Linear Splines')
