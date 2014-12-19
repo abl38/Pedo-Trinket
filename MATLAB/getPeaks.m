@@ -1,4 +1,5 @@
 function peakArray = getPeaks(accData, window)
+% Need to seperate into upper and lower
 jerk = backDiff(accData, 1);
 
 tempArray = [];

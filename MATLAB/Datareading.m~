@@ -99,15 +99,12 @@ figure
 peakArray = getPeaks(sumAcc, avgWindow);
 plot([peakArray', sumAcc])
 title('Peaks of SumAcc')
-
 figure
-splinedAcc = getSplinedMean(sumAcc, avgWindow);
+splined = getSplinedMean(sumAcc, avgWindow);
 plot(mAvgFilter2(splined',avgWindow));
 title('Linear Splined Data for Sum Acc')
-countPeaks(splinedAcc,200)
 
 figure
 splinedJerk = getSplinedMean(sumJerk, avgWindow);
-plot([mAvgFilter2(splinedJerk',avgWindow); sumJerk]);
+plot(mAvgFilter2(splinedJerk',avgWindow); S);
 title('Linear Splined Data for Sum Acc')
-countPeaks(splinedJerk,50)
